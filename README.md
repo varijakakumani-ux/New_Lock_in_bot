@@ -8,6 +8,6 @@ You type in what you're working on, pick how long you want to focus, and hit sta
 
 Open the link, type a task, pick a preset like 25 minutes of work and a 5 minute break, and press Start focus block. When the check-in shows up at the bottom, answer with the buttons or the Y, N and S keys. Try clicking No a few times just to watch the page freak out. When the block ends you'll get a focus score and maybe a badge, and the Stats tab has everything else.
 
-It's just one HTML file with plain HTML, CSS and JavaScript, no frameworks, so you can also run it by opening index.html on your computer. The timer runs off timestamps and a Web Worker so it stays accurate even when you switch tabs, and the colors change with CSS variables as the nag level goes up. Everything you do is saved in your own browser, so you don't need to make an account!
+It's just one HTML file with plain HTML, CSS and JavaScript, no frameworks, so you can also run it by web on your computer. Everything you do is saved locally in your own browser, so you don't need to make an account!
 
 have fun locking in ;D
