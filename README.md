@@ -1,5 +1,3 @@
-Simple nag bot that can annoy you when you are not working and so. 
-All the information is in the bot
-------------------------------------------------------------------------
-Simply you can make a pomodoro with a few clicks on the website, you can play brown noise, diffrent modes
-unlock badges, track your progress, and add a to-do list!
+We all need a little extra accountability sometimes. That’s why I built a simple, highly effective productivity tool featuring a "nag bot" designed to playfully annoy you when you start slacking off.
+
+The app is incredibly straightforward and takes just a few clicks to set up. It combines a classic Pomodoro timer with a built-in brown noise machine to block out external noise. To keep things rewarding, tracking your progress and experimenting with different modes will unlock unique badges. It also includes a built-in to-do list so you can manage your daily tasks all in one place, alongside a seamless dark and light mode toggle to protect your eyes during late-night sessions.
