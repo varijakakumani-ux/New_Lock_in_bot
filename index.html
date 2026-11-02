@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Lock In</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🍅</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet" />
+    <style>
+      :root { --bg: #e9f1eb; --ink: #14241a; --mute: #52665a; --ac: #1f7a4d; --on: #fff; --line: #14241a33; color-scheme: light dark; }
+      @media (prefers-color-scheme: dark) {
+        :root { --bg: #0f1a14; --ink: #e6f1e9; --mute: #9db3a4; --ac: #5fd08f; --on: #08130c; --line: #e6f1e933; }
+      }
+      body[data-heat="1"] { --bg: #f2e6b8; --ink: #2a2208; --mute: #6b5a1f; --ac: #8a5a00; --on: #fff; --line: #2a220833; }
+      body[data-heat="2"] { --bg: #f0c48a; --ink: #2e1804; --mute: #6e4515; --ac: #a33d00; --on: #fff; --line: #2e180433; }
+      body[data-heat="3"] { --bg: #d9482b; --ink: #fff3ea; --mute: #ffd7c4; --ac: #fff3ea; --on: #8e1b16; --line: #fff3ea66; }
+      body[data-heat="4"] { --bg: #6e0f0c; --ink: #fff3ea; --mute: #f5b8a8; --ac: #ffd23f; --on: #3a0806; --line: #fff3ea66; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink); font: 17px/1.5 "Bricolage Grotesque", system-ui, sans-serif; transition: background 0.8s, color 0.8s; }
+      main,
+      header { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+      header { display: flex; justify-content: space-between; align-items: center; padding-top: 22px; padding-bottom: 10px; }
+      main { padding-bottom: 140px; }
+      .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+      nav { display: flex; gap: 4px; }
+      button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+      nav button { padding: 0.3em 0.8em; border-radius: 999px; }
+      [aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+      .btn { background: var(--ac); color: var(--on); padding: 0.7em 1.4em; border-radius: 999px; font-weight: 700; }
+      .ghost { border: 1.5px solid var(--line); padding: 0.55em 1.1em; border-radius: 999px; }
+      :focus-visible { outline: 3px solid var(--ac); outline-offset: 3px; }
+      h1 { font-size: clamp(2rem, 7vw, 3.3rem); line-height: 1.02; font-weight: 800; letter-spacing: -0.03em; margin: 1.2rem 0 0.6rem; }
+      h2 { font-size: 1.3rem; margin: 2rem 0 0.4rem; }
+      p { margin: 0.5rem 0; }
+      .mute { color: var(--mute); }
+      .row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; align-items: center; }
+      label { display: block; color: var(--mute); font-size: 0.9rem; }
+      .chk { display: flex; gap: 10px; align-items: flex-start; color: var(--ink); margin: 10px 0; }
+      .chk input { margin-top: 0.4em; accent-color: var(--ac); }
+      input[type="text"],
+      input[type="number"] { font: inherit; color: var(--ink); background: transparent; border: 0; border-bottom: 2px solid var(--line); padding: 0.4em 0; width: 100%; border-radius: 0; }
+      input[type="text"] { font-size: 1.25rem; }
+      input[type="number"] { width: 7.5rem; font-size: 1.2rem; }
+      .time { font-size: clamp(5.5rem, 25vw, 12rem); font-weight: 800; line-height: 0.95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; margin: 0.3rem 0 0.6rem; }
+      .say { font-size: 1.4rem; font-weight: 600; line-height: 1.2; min-height: 2.4em; }
+      body[data-heat="4"] .time { animation: sh 0.35s infinite; }
+      @keyframes sh {
+        25% { transform: translate(3px, -2px) rotate(0.5deg); }
+        75% { transform: translate(-3px, 2px) rotate(-0.5deg); }
+      }
+      .sum { margin-top: 2rem; padding-top: 1rem; border-top: 1.5px solid var(--line); }
+      .r { display: flex; justify-content: space-between; gap: 12px; padding: 0.55em 0; border-bottom: 1px solid var(--line); }
+      .r button { padding: 0 0.6em; }
+      .spark { font-size: 1.8rem; letter-spacing: 0.08em; }
+      .bar2 { flex: 1; height: 10px; align-self: center; background: var(--line); border-radius: 9px; overflow: hidden; }
+      .bar2 i { display: block; height: 100%; background: var(--ac); }
+      .cf { position: fixed; top: -14px; width: 8px; height: 14px; z-index: 9; animation: fall 2.4s linear forwards; }
+      @keyframes fall {
+        to { transform: translateY(110vh) rotate(720deg); }
+      }
+      .heat { display: grid; grid-template-rows: repeat(7, 14px); grid-auto-flow: column; grid-auto-columns: 14px; gap: 3px; overflow-x: auto; padding: 4px 0; }
+      .heat i { border-radius: 3px; background: var(--ac); }
+      html[data-theme="dark"] body[data-heat="0"] { --bg: #0f1a14; --ink: #e6f1e9; --mute: #9db3a4; --ac: #5fd08f; --on: #08130c; --line: #e6f1e933; }
+      html[data-theme="light"] body[data-heat="0"] { --bg: #e9f1eb; --ink: #14241a; --mute: #52665a; --ac: #1f7a4d; --on: #fff; --line: #14241a33; }
+      .prog { height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; margin: 6px 0 14px; }
+      .prog i { display: block; height: 100%; width: 0; background: var(--ac); }
+      body.zen header { display: none; }
+      .check { position: fixed; left: 0; right: 0; bottom: 0; background: var(--ink); color: var(--bg); padding: 20px 20px calc(22px + env(safe-area-inset-bottom)); }
+      .check > div { max-width: 680px; margin: 0 auto; }
+      .check .q { font-size: 1.5rem; font-weight: 700; line-height: 1.15; margin: 0; }
+      .check .btn { background: var(--bg); color: var(--ink); }
+      .bar { height: 4px; background: currentColor; margin-top: 6px; opacity: 0.6; }
+      @media (prefers-reduced-motion: reduce) {
+        * { animation: none !important; transition: none !important; }
+        .cf { display: none; }
+      }
+      .hrs { display: flex; align-items: flex-end; gap: 3px; height: 80px; margin: 10px 0; }
+      .hrs i { flex: 1; background: var(--ac); min-height: 2px; border-radius: 2px; }
+      .breath { width: 80px; height: 80px; border-radius: 50%; background: var(--ac); margin: 36px auto; animation: br 8s ease-in-out infinite; }
+      @keyframes br {
+        50% { transform: scale(1.7); }
+      }
+    </style>
+  </head>
+  <body data-heat="0">
+    <header>
+      <span class="logo">Lock In</span>
+      <nav>
+        <button data-act="tab" data-v="timer">Timer</button><button data-act="tab" data-v="stats">Stats</button><button data-act="tab" data-v="todo">To-do</button
+        ><button data-act="theme" aria-label="Switch theme">◐</button>
+      </nav>
+    </header>
+    <main id="app"></main>
+    <div id="chk" aria-live="assertive"></div>
+    <script>
+      const KEY = "lockin.v1",
+        $ = (s) => document.querySelector(s);
+      const D = {
+        set: {
+          mode: "normal",
+          tabwatch: false,
+          noise: false,
+          auto: true,
+          theme: "auto",
+          wgoal: 120,
+          hard: false,
+          notify: false,
+          w: 25,
+          b: 5,
+          goal: 4,
+          task: "",
+        },
+        st: {
+          blocks: 0,
+          clean: 0,
+          streak: 0,
+          best: 0,
+          slacks: 0,
+          min: 0,
+          dayStreak: 0,
+          bestDay: 0,
+          lastDay: "",
+          today: "",
+          todayN: 0,
+        },
+        badges: [],
+        hist: [],
+        moods: [],
+        todos: [],
+        days: {},
+        roasts: [],
+        tasks: {},
+        presets: [],
+      };
+      function load() {
+        try {
+          const r = JSON.parse(localStorage.getItem(KEY));
+          if (r)
+            return {
+              ...structuredClone(D),
+              ...r,
+              set: { ...D.set, ...r.set },
+              st: { ...D.st, ...r.st },
+            };
+        } catch {}
+        return structuredClone(D);
+      }
+      function save() {
+        try {
+          localStorage.setItem(KEY, JSON.stringify(DB));
+        } catch {}
+      }
+      let DB = load(),
+        S = { phase: "idle" },
+        V = "timer",
+        AC;
+      const MODES = {
+        gentle: { base: 8, shrink: 0.85, ans: 90, off: 0, cap: 2 },
+        normal: { base: 5, shrink: 0.6, ans: 60, off: 0, cap: 4 },
+        drill: { base: 3, shrink: 0.5, ans: 40, off: 2, cap: 4 },
+      };
+      const M = {
+        check: ["You’ve got this! Still working? 💪", "Hey, just checking in. Still on task?", "Are you ACTUALLY working right now?", "Hello?? Are you working or not?!", "ARE YOU WORKING?!"],
+        yes: ["That’s what I like to see. Keep it up! 🔥", "Good. Stay locked in.", "Okay, I believe you… for now. 👀", "Hmm. Prove it with results.", "FINE. NOW KEEP GOING."],
+        no: [
+          "No worries, breathe and get back to it. You can do it! 🌱",
+          "Close the other tab and get back to work.",
+          "Seriously? Put the phone down.",
+          "COME ON, LOCK IN!! 😤",
+          "LOCK. IN. NOW. YOUR FUTURE SELF IS WATCHING. 😡",
+        ],
+        ign: [
+          "No answer? I’ll count that as a no. You can do it though! 🌱",
+          "Silence? Suspicious. Back to work.",
+          "You ignored me?! Get back to work!",
+          "I SAW THAT. LOCK IN!!",
+          "STOP IGNORING ME AND LOCK IN!!!",
+        ],
+      };
+      const BADGES = {
+        first: "First pomodoro",
+        hat: "Hat trick: 3 clean blocks in a row",
+        unstop: "Unstoppable: 10 clean blocks in a row",
+        marathon: "Marathoner: a clean block of 50+ minutes",
+        owl: "Night owl: finished a block between midnight and 5am",
+        goal: "Goal getter: hit your daily goal",
+        hard: "Hardcore: a clean block in hardcore mode",
+        week: "Week warrior: 7 days in a row",
+        ten: "Getting started: 10 pomodoros",
+        century: "Centurion: 100 pomodoros",
+        hours: "Ten hours: 600 focus minutes",
+        mood10: "Self-aware: logged 10 moods",
+      };
+      const TIPS = [
+        "Put your phone in another room.",
+        "Write down the one thing you want finished by the end of this block.",
+        "Close every tab you don’t need.",
+        "Drink some water first.",
+        "Start with the hardest part.",
+        "Jot down distracting thoughts and keep going.",
+      ];
+      const RANKS = [
+        [0, "Distracted Rookie"],
+        [60, "Warming Up"],
+        [300, "Focused Apprentice"],
+        [1000, "Lock-In Specialist"],
+        [3000, "Deep Work Master"],
+        [6000, "Pomodoro Legend"],
+      ];
+      const rank = (m) => RANKS.filter((r) => m >= r[0]).pop()[1];
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const ymd = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      const lv = () => Math.max(0, Math.min(S.nag + MODES[S.mode].off, MODES[S.mode].cap)),
+        pick = (k) => ((k == "no" || k == "ign") && DB.roasts.length && Math.random() < 0.35 ? DB.roasts[(Math.random() * DB.roasts.length) | 0] : M[k][lv()]);
+      const delay = () => {
+        const m = MODES[S.mode];
+        return Math.max(30, m.base * m.shrink ** S.nag * 60) * 1000 * (0.8 + Math.random() * 0.4);
+      };
+      const dayStreak = () => {
+        const s = DB.st,
+          n = new Date();
+        return [ymd(n), ymd(new Date(n - 864e5))].includes(s.lastDay) ? s.dayStreak : 0;
+      };
+
+      function audio() {
+        try {
+          AC = AC || new AudioContext();
+        } catch {}
+      }
+      function ping(t, b, f = 660) {
+        if (!DB.set.notify) return;
+        try {
+          if (AC) {
+            AC.resume();
+            const o = AC.createOscillator(),
+              g = AC.createGain();
+            o.frequency.value = f;
+            g.gain.value = 0.08;
+            o.connect(g);
+            g.connect(AC.destination);
+            o.start();
+            o.stop(AC.currentTime + 0.25);
+          }
+          if (Notification.permission === "granted") new Notification(t, { body: b });
+        } catch {}
+      }
+
+      function record(min, sl, hard) {
+        const s = DB.st,
+          n = new Date(),
+          day = ymd(n),
+          old = rank(s.min);
+        if (s.lastDay !== day) {
+          s.dayStreak = s.lastDay === ymd(new Date(n - 864e5)) ? s.dayStreak + 1 : 1;
+          s.lastDay = day;
+          s.bestDay = Math.max(s.bestDay, s.dayStreak);
+        }
+        if (s.today !== day) {
+          s.today = day;
+          s.todayN = 0;
+        }
+        s.todayN++;
+        s.blocks++;
+        s.min += min;
+        s.slacks += sl;
+        DB.days[day] = (DB.days[day] || 0) + min;
+        DB.tasks[S.task] = (DB.tasks[S.task] || 0) + min;
+        if (!sl) {
+          s.clean++;
+          s.streak++;
+          s.best = Math.max(s.best, s.streak);
+        } else s.streak = 0;
+        DB.hist = [...DB.hist, { day, task: S.task, min, sl }].slice(-10);
+        const got = [],
+          give = (k) => {
+            if (!DB.badges.includes(k)) {
+              DB.badges.push(k);
+              got.push(k);
+            }
+          };
+        give("first");
+        if (s.streak >= 3) give("hat");
+        if (s.streak >= 10) give("unstop");
+        if (min >= 50 && !sl) give("marathon");
+        if (n.getHours() < 5) give("owl");
+        if (DB.set.goal && s.todayN >= DB.set.goal) give("goal");
+        if (hard && !sl) give("hard");
+        if (s.dayStreak >= 7) give("week");
+        if (s.blocks >= 10) give("ten");
+        if (s.blocks >= 100) give("century");
+        if (s.min >= 600) give("hours");
+        save();
+        return {
+          streak: s.streak,
+          n: s.todayN,
+          rankUp: rank(s.min) !== old ? rank(s.min) : null,
+          got,
+          slacked: sl,
+          score: Math.max(0, 100 - sl * 20),
+          mood: null,
+          hour: n.getHours(),
+          day,
+          task: S.task,
+        };
+      }
+
+      function start() {
+        const w = +$("#w").value,
+          b = +$("#b").value;
+        if (!(w > 0 && b > 0)) {
+          $("#err").textContent = "Work and break each need to be more than 0 minutes.";
+          return;
+        }
+        Object.assign(DB.set, { w, b, task: $("#task").value.trim() });
+        save();
+        audio();
+        S = {
+          phase: "work",
+          mode: DB.set.mode,
+          hard: DB.set.hard,
+          task: DB.set.task || "your work",
+          w,
+          b,
+          cycles: 0,
+        };
+        beginWork();
+      }
+      function beginWork() {
+        const n = Date.now();
+        Object.assign(S, {
+          phase: "work",
+          nag: 0,
+          slacked: 0,
+          snoozes: S.hard ? 0 : 2,
+          pauseUsed: false,
+          paused: false,
+          checking: null,
+          sum: null,
+          half: 0,
+          five: 0,
+          say: "Tip: " + TIPS[(Math.random() * TIPS.length) | 0],
+          endsAt: n + S.w * 6e4,
+        });
+        S.nextCheck = n + delay();
+        noise(true);
+        go();
+      }
+      function finishWork() {
+        noise(false);
+        S.checking = null;
+        S.cycles++;
+        S.sum = record(S.w, S.slacked, S.hard);
+        if (S.sum.got.length || (DB.set.goal && S.sum.n == DB.set.goal)) confetti();
+        const long = S.cycles % 4 == 0;
+        S.phase = "break";
+        S.cur = long ? S.b * 3 : S.b;
+        S.endsAt = Date.now() + S.cur * 6e4;
+        S.say = "Break idea: " + BR[(Math.random() * BR.length) | 0];
+        ping("Work block done!", long ? "Long break. You earned it." : "Break time.", 880);
+        go();
+      }
+      function finishBreak() {
+        ping("Break’s over", "Back to it!");
+        if (DB.set.auto === false) {
+          S.phase = "ready";
+          S.checking = null;
+          go();
+        } else beginWork();
+      }
+      function openCheck() {
+        const t = Math.max(15, MODES[S.mode].ans - S.nag * 10);
+        S.checking = {
+          dl: Date.now() + t * 1e3,
+          tot: t * 1e3,
+          q: pick("check"),
+          snz: S.snoozes > 0,
+        };
+        ping("Still working?", S.checking.q);
+        go();
+      }
+      function answer(v) {
+        const n = Date.now();
+        S.checking = null;
+        if (v == "yes") {
+          S.say = pick("yes");
+          S.nag = Math.max(0, S.nag - 1);
+          S.nextCheck = n + delay();
+        } else if (v == "snooze") {
+          S.snoozes--;
+          S.say = "Fine… 5 more minutes. (" + S.snoozes + " snooze(s) left.)";
+          S.nextCheck = n + 3e5;
+        } else {
+          S.say = pick(v == "no" ? "no" : "ign");
+          S.slacked++;
+          S.nag++;
+          S.nextCheck = n + delay();
+        }
+        go();
+      }
+      function pause() {
+        if (S.hard || S.pauseUsed || S.checking) return;
+        S.paused = true;
+        S.pauseUsed = true;
+        S.pausedAt = Date.now();
+        go();
+      }
+      function resume() {
+        const g = Date.now() - S.pausedAt;
+        S.endsAt += g;
+        S.nextCheck += g;
+        S.paused = false;
+        go();
+      }
+      function stop() {
+        if (S.hard && S.phase == "work") {
+          if (!confirm("Quitting mid-block in hardcore mode resets your streak. Quit anyway?")) return;
+          DB.st.streak = 0;
+          save();
+        }
+        document.body.classList.remove("zen");
+        noise(false);
+        S = { phase: "idle" };
+        document.title = "Lock In";
+        go();
+      }
+      function tick() {
+        if (S.phase == "idle" || S.phase == "ready") return;
+        const n = Date.now();
+        if (S.paused) {
+          if (n - S.pausedAt > 6e5) resume();
+          return paint();
+        }
+        if (n >= S.endsAt) return S.phase == "work" ? finishWork() : finishBreak();
+        if (S.checking && n >= S.checking.dl) answer("ign");
+        else if (S.phase == "work" && !S.checking && n >= S.nextCheck && S.nextCheck < S.endsAt) openCheck();
+        if (S.phase == "work" && !S.checking) {
+          const l = S.endsAt - n,
+            t = S.w * 6e4;
+          if (!S.half && t >= 6e5 && l <= t / 2) {
+            S.half = 1;
+            S.say = "Halfway there! Keep that momentum going.";
+            ping("Halfway", "Keep going!");
+            go();
+          } else if (!S.five && t >= 9e5 && l <= 3e5) {
+            S.five = 1;
+            S.say = "5 minutes left. Finish strong!";
+            ping("5 minutes left", "Finish strong!");
+            go();
+          }
+        }
+        paint();
+      }
+
+      const vSetup =
+        () => `<h1>What are you locking in on?</h1><p class="mute">I’ll check in while you work. Admit you’re slacking, or ignore me, and I get louder.</p><p class="mute">Today: ${DB.st.today == ymd(new Date()) ? DB.st.todayN : 0}/${DB.set.goal} pomodoros. Day streak: ${dayStreak()}.</p>
+<input id="task" type="text" maxlength="80" placeholder="Write the intro paragraph" value="${esc(DB.set.task)}" aria-label="Task">
+<div class="row">${[[15, 3], [25, 5], [50, 10], [90, 20], ...DB.presets].map((p) => `<button class="ghost" data-act="preset" data-w="${p[0]}" data-b="${p[1]}">${p[0]} / ${p[1]} min</button>`).join("")}</div>
+<div class="row"><label>Work minutes<input id="w" type="number" min="0.1" step="any" value="${DB.set.w}"></label><label>Break minutes<input id="b" type="number" min="0.1" step="any" value="${DB.set.b}"></label><button class="ghost" data-act="savepre">Save these times</button></div>
+<p>How loud should I get?</p><div class="row">${["gentle", "normal", "drill"].map((m) => `<button class="ghost" data-act="mode" data-v="${m}" aria-pressed="${DB.set.mode == m}">${m[0].toUpperCase() + m.slice(1)}</button>`).join("")}</div>
+<label class="chk"><input type="checkbox" data-act="hard" ${DB.set.hard ? "checked" : ""}>Hardcore: no snooze, no pause, and quitting resets your streak.</label>
+<label class="chk"><input type="checkbox" data-act="notify" ${DB.set.notify ? "checked" : ""}>Play a sound and send a browser notification at check-ins.</label>
+<label class="chk"><input type="checkbox" data-act="auto" ${DB.set.auto !== false ? "checked" : ""}>Start the next block automatically after each break.</label>
+<label class="chk"><input type="checkbox" data-act="noise" ${DB.set.noise ? "checked" : ""}>Play soft brown noise while I work.</label>
+<label class="chk"><input type="checkbox" data-act="tabw" ${DB.set.tabwatch ? "checked" : ""}>Tab watch: leaving this tab for more than 30 seconds counts as slacking.</label>
+<p id="err" role="alert"></p><div class="row"><button class="btn" data-act="start">Start focus block</button></div>
+<h2>How it works</h2><p>Start a block and I’ll check in at random times. Say you’re working and I calm down. Say no, or ignore me, and I check in more often and get louder. Finish a block without slacking to grow your streak, earn badges, and climb the ranks.</p>`;
+      const vSum = () => {
+        const m = S.sum;
+        return `<section class="sum"><h2>Block done</h2><p>${m.slacked ? `I caught you slacking ${m.slacked} time(s). Streak reset.` : `Zero slacking. Clean streak: ${m.streak}.`} Focus score: ${m.score}/100. Today: ${m.n}${DB.set.goal ? "/" + DB.set.goal : ""}.${m.rankUp ? ` Rank up: you’re now a ${m.rankUp}.` : ""}</p>${m.got.map((k) => `<p>New badge: ${BADGES[k]}</p>`).join("")}${m.mood == null ? `<p>How focused did that block feel?</p><div class="row">${[1, 2, 3, 4, 5].map((n) => `<button class="ghost" data-act="mood" data-v="${n}" aria-label="${n} out of 5">${[..."😫😕😐🙂🤩"][n - 1]}</button>`).join("")}</div>` : `<p class="mute">Mood logged: ${m.mood}/5.</p>`}${m.note ? `<p class="mute">Saved: ${esc(m.note)}</p>` : `<div class="row"><input id="noteIn" type="text" maxlength="100" placeholder="One thing you got done" aria-label="Note"><button class="ghost" data-act="note">Save note</button></div>`}</section>`;
+      };
+      const vRun = () => {
+        if (S.phase == "ready")
+          return `<h1>Break’s over.</h1><p class="say">Ready for the next block?</p><div class="row"><button class="btn" data-act="next">Start next block</button><button class="ghost" data-act="stop">Stop</button></div>`;
+        const w = S.phase == "work",
+          c = !w && S.cycles % 4 == 0 ? 4 : S.cycles % 4;
+        return `<p class="mute" aria-hidden="true">${"●".repeat(c) + "○".repeat(4 - c)} until a long break</p><p class="mute">${w ? "Focusing on " + esc(S.task) : S.cur > S.b ? "Long break" : "Break"}${S.paused ? " (paused)" : ""}</p><div class="time" id="time">--:--</div><div class="prog" aria-hidden="true"><i id="pg"></i></div>
+<p class="say">${esc(S.say || (w ? "I’ll check in on you." : "Stretch, drink water, and stay off TikTok."))}</p>${w ? `<p class="mute">Nag level ${S.nag}${S.slacked ? ", caught slacking " + S.slacked + "x" : ""}</p>` : ""}
+<div class="row">${w ? (S.hard ? "" : S.paused ? '<button class="btn" data-act="pause">Resume</button>' : S.pauseUsed ? "" : '<button class="ghost" data-act="pause">Pause</button>') : '<button class="ghost" data-act="skip">Skip break</button>'}${w ? '<button class="ghost" data-act="more">+5 min</button><button class="ghost" data-act="zen">Zen mode</button>' : ""}<button class="ghost" data-act="stop">Stop</button></div>${!w && S.sum ? vSum() : ""}`;
+      };
+      const vCheck = () =>
+        `<div class="check" role="alertdialog" aria-label="Check-in"><div><p class="q">${S.checking.q}</p><div class="row"><button class="btn" data-act="ans" data-v="yes">Yes, I’m working</button><button class="btn" data-act="ans" data-v="no">No…</button>${S.checking.snz ? '<button class="btn" data-act="ans" data-v="snooze">Snooze 5 min</button>' : ""}</div><div class="bar" id="bar"></div><p id="cd"></p></div></div>`;
+      function vStats() {
+        const s = DB.st,
+          m = DB.moods,
+          avg = (a) => a.reduce((x, y) => x + y.r, 0) / a.length,
+          ins = [];
+        const rows = [
+          ["Pomodoros", s.blocks],
+          ["Clean blocks", s.clean],
+          ["Streak", `${s.streak} (best ${s.best})`],
+          ["Day streak", `${dayStreak()} (best ${s.bestDay})`],
+          ["Caught slacking", s.slacks],
+          ["Focus score (last 10 sessions)", fs()],
+          ["Focus minutes", Math.round(s.min)],
+          ["Rank", rank(s.min)],
+          ["Next rank", nr()],
+          ["Today", `${s.today == ymd(new Date()) ? s.todayN : 0}`],
+        ];
+        if (m.length) {
+          ins.push(`Average feeling: ${avg(m).toFixed(1)}/5 over ${m.length} block(s).`);
+          const B = [
+            ["morning", (h) => h >= 5 && h < 12],
+            ["afternoon", (h) => h >= 12 && h < 17],
+            ["evening", (h) => h >= 17 && h < 22],
+            ["night", (h) => h >= 22 || h < 5],
+          ]
+            .map(([n, f]) => [n, m.filter((x) => f(x.hour))])
+            .filter((x) => x[1].length >= 2)
+            .map((x) => [avg(x[1]), x[0]]);
+          if (B.length > 1) ins.push(`You feel most focused in the ${B.sort((a, b) => b[0] - a[0])[0][1]}.`);
+          const c = m.filter((x) => !x.sl),
+            d = m.filter((x) => x.sl);
+          if (c.length && d.length) ins.push(`Clean blocks feel like ${avg(c).toFixed(1)}/5. Blocks where I caught you slacking feel like ${avg(d).toFixed(1)}/5.`);
+        }
+        return `<h1>Your stats</h1>${rows.map((r) => `<div class="r"><span>${r[0]}</span><b>${r[1]}</b></div>`).join("")}
+<div class="r"><span>Daily goal (pomodoros)</span><span><button data-act="goal" data-v="-1" aria-label="Lower goal">−</button> <b>${DB.set.goal}</b> <button data-act="goal" data-v="1" aria-label="Raise goal">+</button></span></div>
+<div class="r"><span>Weekly goal (minutes)</span><span><button data-act="wgoal" data-v="-30" aria-label="Lower weekly goal">−</button> <b>${DB.set.wgoal}</b> <button data-act="wgoal" data-v="30" aria-label="Raise weekly goal">+</button></span></div>
+<div class="bar2" style="display:block;margin:10px 0"><i style="width:${Math.min(100, (wsum() / DB.set.wgoal) * 100)}%"></i></div><p class="mute">${wsum()} of ${DB.set.wgoal} minutes in the last 7 days.</p>
+<h2>Badges</h2>${Object.keys(BADGES)
+          .map((k) => `<p>${DB.badges.includes(k) ? "✅" : "🔒"} ${BADGES[k]}</p>`)
+          .join("")}
+<h2>Mood</h2>${
+          m.length
+            ? `<p class="spark" aria-hidden="true">${m
+                .slice(-30)
+                .map((x) => "▁▃▅▆█"[x.r - 1])
+                .join("")}</p>${ins.map((i) => `<p>${i}</p>`).join("")}`
+            : '<p class="mute">No mood check-ins yet. Finish a block and tap a face.</p>'
+        }
+<h2>Last 7 days</h2>${wk()}
+<h2>Last 12 weeks</h2><div class="heat" aria-hidden="true">${heatmap()}</div>
+<h2>Time by task</h2>${tt()}
+<h2>Recent sessions</h2>${
+          DB.hist.length
+            ? [...DB.hist]
+                .reverse()
+                .map((h) => `<p>${h.day}: ${esc(h.task)}, ${h.min} min, ${h.sl} slack(s)${h.note ? ". " + esc(h.note) : ""}</p>`)
+                .join("")
+            : '<p class="mute">Nothing yet. Start a block.</p>'
+        }
+<h2>Your own roasts</h2><p class="mute">I’ll mix these in when you slack. ${DB.roasts.length} saved.</p><div class="row"><input id="roastIn" type="text" maxlength="80" placeholder="Type a roast, like Your couch can wait." aria-label="New roast"><button class="ghost" data-act="roast">Add roast</button></div>
+<div class="row"><button class="ghost" data-act="copy">Copy my stats</button><button class="ghost" data-act="export">Export data</button><button class="ghost" data-act="import">Import data</button><button class="ghost" data-act="reset">Reset all data</button></div>`;
+      }
+      const vTodo =
+        () => `<h1>To-do</h1><div class="row"><input id="todoIn" type="text" maxlength="80" placeholder="Add something you need to finish" aria-label="New to-do"><button class="btn" data-act="add">Add</button></div>
+${DB.todos.length ? DB.todos.map((t, i) => `<div class="r"><span>${esc(t)} <span class="mute">${Math.round(DB.tasks[t] || 0)} min</span></span><span><button class="ghost" data-act="focus" data-i="${i}">Focus</button> <button class="ghost" data-act="done" data-i="${i}">Done</button></span></div>`).join("") : '<p class="mute">Nothing here yet. Add the first thing you need to finish.</p>'}`;
+
+      const BR = [
+        "Stand up and stretch for a full minute.",
+        "Look at something far away to rest your eyes.",
+        "Refill your water.",
+        "Take ten slow breaths.",
+        "Walk around the room.",
+        "Tidy one small thing on your desk.",
+      ];
+      function confetti() {
+        for (let i = 0; i < 50; i++) {
+          const d = document.createElement("i");
+          d.className = "cf";
+          d.style.cssText = `left:${Math.random() * 100}vw;background:hsl(${Math.random() * 360} 80% 55%);animation-delay:${Math.random() * 0.6}s`;
+          document.body.append(d);
+          setTimeout(() => d.remove(), 3400);
+        }
+      }
+      let NZ;
+      function noise(on) {
+        try {
+          if (NZ) {
+            NZ.stop();
+            NZ = null;
+          }
+          if (!on || !DB.set.noise || !AC) return;
+          const b = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate),
+            d = b.getChannelData(0);
+          let l = 0;
+          for (let i = 0; i < d.length; i++) {
+            l = (l + 0.02 * (Math.random() * 2 - 1)) / 1.02;
+            d[i] = l * 3.5;
+          }
+          const s = AC.createBufferSource(),
+            g = AC.createGain();
+          s.buffer = b;
+          s.loop = true;
+          g.gain.value = 0.25;
+          s.connect(g);
+          g.connect(AC.destination);
+          s.start();
+          NZ = s;
+        } catch {}
+      }
+      const heatmap = () =>
+        [...Array(84)]
+          .map((_, i) => {
+            const k = ymd(new Date(Date.now() - (83 - i) * 864e5)),
+              m = DB.days[k] || 0;
+            return `<i title="${k}: ${Math.round(m)} min" style="opacity:${m ? Math.min(1, 0.25 + m / 120) : 0.12}"></i>`;
+          })
+          .join("");
+      const nr = () => {
+        const m = DB.st.min,
+          r = RANKS.find((x) => x[0] > m);
+        return r ? `${Math.ceil(r[0] - m)} min to ${r[1]}` : "Top rank reached";
+      };
+      const tt = () => {
+        const a = Object.entries(DB.tasks)
+          .sort((x, y) => y[1] - x[1])
+          .slice(0, 5);
+        return a.length ? a.map((x) => `<div class="r"><span>${esc(x[0])}</span><b>${Math.round(x[1])} min</b></div>`).join("") : '<p class="mute">Finish a block to see where your time goes.</p>';
+      };
+      function applyTheme() {
+        document.documentElement.dataset.theme = DB.set.theme || "auto";
+      }
+      const fs = () => (DB.hist.length ? Math.round(DB.hist.reduce((a, h) => a + Math.max(0, 100 - h.sl * 20), 0) / DB.hist.length) + "/100" : "None yet");
+      const wsum = () => Math.round([...Array(7)].reduce((a, _, i) => a + (DB.days[ymd(new Date(Date.now() - i * 864e5))] || 0), 0));
+      const wk = () => {
+        const n = Date.now(),
+          a = [...Array(7)].map((_, i) => {
+            const d = new Date(n - (6 - i) * 864e5);
+            return [d.toLocaleDateString(undefined, { weekday: "short" }), Math.round(DB.days[ymd(d)] || 0)];
+          }),
+          mx = Math.max(30, ...a.map((x) => x[1]));
+        return a.map((x) => `<div class="r"><span>${x[0]}</span><span class="bar2"><i style="width:${(x[1] / mx) * 100}%"></i></span><b>${x[1]} min</b></div>`).join("");
+      };
+      function render() {
+        document.body.dataset.heat = S.phase == "work" ? lv() : 0;
+        document.querySelectorAll("nav button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v == V));
+        $("#app").innerHTML = V == "stats" ? vStats() : V == "todo" ? vTodo() : S.phase == "idle" ? vSetup() : vRun();
+        $("#chk").innerHTML = S.checking ? vCheck() : "";
+        paint();
+      }
+      const go = render;
+      function paint() {
+        const t = $("#time");
+        if (S.phase != "idle") {
+          const l = Math.max(0, Math.ceil((S.endsAt - (S.paused ? S.pausedAt : Date.now())) / 1e3)),
+            f = String((l / 60) | 0).padStart(2, "0") + ":" + String(l % 60).padStart(2, "0");
+          if (t) t.textContent = f;
+          const pg = $("#pg");
+          if (pg) pg.style.width = Math.min(100, 100 - (l / ((S.phase == "work" ? S.w : S.cur) * 60)) * 100) + "%";
+          document.title = S.checking ? "Still working?" : f + " Lock In";
+        }
+        if (S.checking) {
+          const r = Math.max(0, S.checking.dl - Date.now());
+          $("#cd").textContent = Math.ceil(r / 1e3) + "s to answer. Keys: Y, N, S.";
+          $("#bar").style.width = (r / S.checking.tot) * 100 + "%";
+        }
+      }
+      function add() {
+        const i = $("#todoIn"),
+          v = i.value.trim();
+        if (!v || DB.todos.length >= 15) return;
+        DB.todos.push(v);
+        save();
+        render();
+        $("#todoIn").focus();
+      }
+
+      const A = {
+        start,
+        tab: (b) => {
+          V = b.dataset.v;
+          render();
+        },
+        preset: (b) => {
+          $("#w").value = b.dataset.w;
+          $("#b").value = b.dataset.b;
+        },
+        mode: (b) => {
+          DB.set.mode = b.dataset.v;
+          save();
+          document.querySelectorAll("[data-act=mode]").forEach((x) => x.setAttribute("aria-pressed", x === b));
+        },
+        hard: (b) => {
+          DB.set.hard = b.checked;
+          save();
+        },
+        notify: (b) => {
+          DB.set.notify = b.checked;
+          save();
+          if (b.checked) {
+            audio();
+            try {
+              Notification.requestPermission();
+            } catch {}
+          }
+        },
+        pause: () => (S.paused ? resume() : pause()),
+        stop,
+        skip: finishBreak,
+        more: () => {
+          S.endsAt += 3e5;
+          S.w += 5;
+          go();
+        },
+        tabw: (b) => {
+          DB.set.tabwatch = b.checked;
+          save();
+        },
+        auto: (b) => {
+          DB.set.auto = b.checked;
+          save();
+        },
+        next: beginWork,
+        zen: () => document.body.classList.toggle("zen"),
+        theme: () => {
+          DB.set.theme = { auto: "light", light: "dark", dark: "auto" }[DB.set.theme || "auto"];
+          save();
+          applyTheme();
+        },
+        wgoal: (b) => {
+          DB.set.wgoal = Math.max(30, Math.min(3000, (DB.set.wgoal || 120) + +b.dataset.v));
+          save();
+          render();
+        },
+        savepre: () => {
+          const w = +$("#w").value,
+            b = +$("#b").value;
+          if (w > 0 && b > 0 && DB.presets.length < 4 && !DB.presets.some((p) => p[0] == w && p[1] == b)) {
+            DB.presets.push([w, b]);
+            save();
+            render();
+          }
+        },
+        note: () => {
+          const v = $("#noteIn").value.trim();
+          if (v && S.sum) {
+            S.sum.note = v;
+            DB.hist[DB.hist.length - 1].note = v;
+            save();
+            render();
+          }
+        },
+        noise: (b) => {
+          DB.set.noise = b.checked;
+          save();
+          if (b.checked) audio();
+        },
+        ans: (b) => answer(b.dataset.v),
+        mood: (b) => {
+          const n = +b.dataset.v,
+            m = S.sum;
+          m.mood = n;
+          DB.moods = [...DB.moods, { day: m.day, hour: m.hour, r: n, sl: m.slacked, task: m.task }].slice(-50);
+          if (DB.moods.length >= 10 && !DB.badges.includes("mood10")) {
+            DB.badges.push("mood10");
+            m.got.push("mood10");
+          }
+          save();
+          render();
+        },
+        goal: (b) => {
+          DB.set.goal = Math.max(0, Math.min(20, DB.set.goal + +b.dataset.v));
+          save();
+          render();
+        },
+        add,
+        focus: (b) => {
+          DB.set.task = DB.todos[b.dataset.i];
+          if (S.phase != "idle") S.task = DB.set.task;
+          save();
+          V = "timer";
+          render();
+        },
+        done: (b) => {
+          DB.todos.splice(b.dataset.i, 1);
+          save();
+          render();
+        },
+        copy: () => {
+          const s = DB.st;
+          navigator.clipboard.writeText(`Lock In: ${s.blocks} pomodoros, ${Math.round(s.min)} focus minutes, best streak ${s.best}, rank ${rank(s.min)}.`).then(
+            () => alert("Copied!"),
+            () => alert("Couldn’t copy."),
+          );
+        },
+        roast: () => {
+          const v = $("#roastIn").value.trim();
+          if (v && DB.roasts.length < 30) {
+            DB.roasts.push(v);
+            save();
+            render();
+          }
+        },
+        export: () => {
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(new Blob([JSON.stringify(DB)], { type: "application/json" }));
+          a.download = "lock-in-data.json";
+          a.click();
+        },
+        import: () => {
+          const f = document.createElement("input");
+          f.type = "file";
+          f.accept = ".json";
+          f.onchange = async () => {
+            try {
+              const r = JSON.parse(await f.files[0].text());
+              DB = {
+                ...structuredClone(D),
+                ...r,
+                set: { ...D.set, ...r.set },
+                st: { ...D.st, ...r.st },
+              };
+              save();
+              render();
+            } catch {
+              alert("That file isn’t a Lock In export.");
+            }
+          };
+          f.click();
+        },
+        reset: () => {
+          if (confirm("Delete all your stats and to-dos?")) {
+            DB = structuredClone(D);
+            save();
+            render();
+          }
+        },
+      };
+      document.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-act]");
+        if (b) A[b.dataset.act](b);
+      });
+      document.addEventListener("input", (e) => {
+        const i = e.target.id;
+        if (i == "task") DB.set.task = e.target.value;
+        if (i == "w" || i == "b") DB.set[i] = +e.target.value || DB.set[i];
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key != "Enter") return;
+        if (e.target.id == "task") start();
+        if (e.target.id == "todoIn") add();
+        if (e.target.id == "roastIn") A.roast();
+        if (e.target.id == "noteIn") A.note();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (!S.checking || /INPUT|TEXTAREA/.test(e.target.tagName) || e.ctrlKey || e.metaKey) return;
+        const k = e.key.toLowerCase();
+        if (k == "y") answer("yes");
+        else if (k == "n") answer("no");
+        else if (k == "s" && S.checking.snz) answer("snooze");
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.code == "Space" && S.phase == "work" && !S.checking && !/INPUT|TEXTAREA|BUTTON/.test(e.target.tagName)) {
+          e.preventDefault();
+          S.paused ? resume() : pause();
+        }
+      });
+      let away = 0;
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          away = Date.now();
+          return;
+        }
+        if (away && DB.set.tabwatch && S.phase == "work" && !S.paused && Date.now() - away > 3e4) {
+          const s = Math.round((Date.now() - away) / 1e3);
+          S.checking = null;
+          S.slacked++;
+          S.nag++;
+          S.nextCheck = Date.now() + delay();
+          S.say = "You left this tab for " + s + "s. That counts as slacking.";
+          go();
+        }
+        away = 0;
+      });
+      try {
+        const w = new Worker(URL.createObjectURL(new Blob(["setInterval(()=>postMessage(0),1000)"])));
+        w.onmessage = tick;
+      } catch {
+        setInterval(tick, 1000);
+      }
+      applyTheme();
+      render();
+
+      /* ---- Extra features: daily challenge, distraction log, breathing guide, charts ---- */
+      BADGES.challenge = "Challenger: finished a daily challenge";
+      const tdy = () => ymd(new Date());
+      const cl = () => (DB.ct && DB.ct.day == tdy() ? DB.ct.n : 0);
+      const blocksToday = () => (DB.st.today == tdy() ? DB.st.todayN : 0);
+      const CH = [
+        { t: "Focus for 60 minutes today", f: () => (DB.days[tdy()] || 0) / 60, s: () => Math.round(DB.days[tdy()] || 0) + " of 60 minutes" },
+        { t: "Finish 3 pomodoros today", f: () => blocksToday() / 3, s: () => blocksToday() + " of 3 blocks" },
+        { t: "Finish 2 clean blocks today", f: () => cl() / 2, s: () => cl() + " of 2 clean blocks" },
+      ];
+      const chToday = () => CH[[...tdy()].reduce((a, c) => a + c.charCodeAt(0), 0) % CH.length];
+      const QUOTES = [
+        "Small blocks, big results.",
+        "You don’t need motivation. You need the next ten minutes.",
+        "Start messy. Fix it later.",
+        "Focus is a muscle, and today is a rep.",
+        "Done beats perfect.",
+        "One clean block makes the next one easier.",
+        "Future you is counting on this block.",
+        "Distraction is just a bad habit with good snacks.",
+      ];
+      const DISTRACTIONS = ["Phone", "Social media", "Noise", "Hunger", "My own thoughts"];
+
+      // Wrap record() so every finished block also updates the hour chart and the daily challenge.
+      const _record = record;
+      record = function (min, sl, hard) {
+        const r = _record(min, sl, hard);
+        DB.hours = DB.hours || {};
+        const h = new Date().getHours();
+        DB.hours[h] = (DB.hours[h] || 0) + min;
+        if (!sl) DB.ct = { day: tdy(), n: cl() + 1 };
+        if (chToday().f() >= 1 && DB.chDone !== tdy()) {
+          DB.chDone = tdy();
+          if (!DB.badges.includes("challenge")) {
+            DB.badges.push("challenge");
+            r.got.push("challenge");
+          }
+          confetti();
+        }
+        save();
+        return r;
+      };
+
+      A.distract = (b) => {
+        if (S.phase != "work" || S.paused) return;
+        const r = b.dataset.v;
+        DB.distractions = DB.distractions || {};
+        DB.distractions[r] = (DB.distractions[r] || 0) + 1;
+        save();
+        S.slacked++;
+        S.nag++;
+        S.checking = null;
+        S.nextCheck = Date.now() + delay();
+        S.say = "Logged: " + r + ". Now get back to it.";
+        go();
+      };
+      A.csv = () => {
+        const q = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+        const rows = [["date", "task", "minutes", "slacks", "note"], ...DB.hist.map((h) => [h.day, h.task, h.min, h.sl, h.note || ""])];
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([rows.map((r) => r.map(q).join(",")).join("\n")], { type: "text/csv" }));
+        a.download = "lock-in-history.csv";
+        a.click();
+      };
+
+      // Extras are added after each render, so the main views stay simple.
+      function extras() {
+        const a = $("#app");
+        if (!a || a.querySelector("[data-x]")) return;
+        let h = "";
+        if (V == "stats") {
+          const m = DB.st.min,
+            rk = RANKS.filter((r) => m >= r[0]).pop(),
+            nx = RANKS.find((r) => r[0] > m);
+          const pct = nx ? ((m - rk[0]) / (nx[0] - rk[0])) * 100 : 100;
+          const hrs = DB.hours || {},
+            mx = Math.max(1, ...Object.values(hrs));
+          const dist = Object.entries(DB.distractions || {}).sort((x, y) => y[1] - x[1]);
+          h = `<h2>Rank progress</h2><p>${rk[1]}${nx ? " → " + nx[1] : ""}</p><div class="bar2" style="display:block"><i style="width:${pct}%"></i></div>
+      <h2>Focus by hour</h2><div class="hrs" aria-hidden="true">${[...Array(24)].map((_, i) => `<i style="height:${((hrs[i] || 0) / mx) * 100}%"></i>`).join("")}</div>
+      <p class="mute">Midnight on the left, 11 PM on the right. Taller bars mean more focus.</p>
+      <h2>What distracts you</h2>${dist.length ? dist.map((x) => `<div class="r"><span>${esc(x[0])}</span><b>${x[1]}</b></div>`).join("") : '<p class="mute">Log distractions during a block to see your patterns.</p>'}
+      <div class="row"><button class="ghost" data-act="csv">Download history (CSV)</button></div>`;
+        } else if (V == "timer" && S.phase == "idle") {
+          const c = chToday();
+          h = `<h2>Today’s challenge</h2><p>${c.t}${DB.chDone == tdy() ? " ✅" : ""}</p><div class="bar2" style="display:block;margin:8px 0"><i style="width:${Math.min(1, c.f()) * 100}%"></i></div><p class="mute">${c.s()}</p>
+      <h2>Thought for the day</h2><p>${QUOTES[[...tdy()].reduce((x, y) => x + y.charCodeAt(0), 0) % QUOTES.length]}</p>`;
+        } else if (V == "timer" && S.phase == "work") {
+          h = `<h2>Got distracted?</h2><p class="mute">Tell me what pulled you away. It counts as slacking, and I’ll remember.</p>
+      <div class="row">${DISTRACTIONS.map((d) => `<button class="ghost" data-act="distract" data-v="${d}">${d}</button>`).join("")}</div>`;
+        } else if (V == "timer" && S.phase == "break") {
+          h = `<div class="breath" aria-hidden="true"></div><p class="mute">Breathe in as the circle grows and out as it shrinks.</p>`;
+        }
+        if (h) a.insertAdjacentHTML("beforeend", `<div data-x>${h}</div>`);
+      }
+      new MutationObserver(extras).observe($("#app"), { childList: true });
+      extras();
+    </script>
+  </body>
+</html>
